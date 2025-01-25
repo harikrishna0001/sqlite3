@@ -96,6 +96,35 @@ def delete_students():
     print(f"Student with ID {student_id} and their marks deleted.")
 
 
+def edit_student_details():
+    sqliteconnection = sqlite3.connect('students.db')
+    cursor = sqliteconnection.cursor()
+
+    # Ask for the student ID
+    student_id = input("Enter the ID of the student you want to edit: ")
+
+    # Ask for the new name
+    new_name = input("Enter the new name of the student: ")
+
+    # Update the name in the students table
+    cursor.execute("""
+    UPDATE students
+    SET name = ?
+    WHERE id = ?
+    """, (new_name, student_id))
+
+    # Also update the name in the marklist table to maintain consistency
+    cursor.execute("""
+    UPDATE marklist
+    SET name = ?
+    WHERE student_id = ?
+    """, (new_name, student_id))
+
+    sqliteconnection.commit()
+    sqliteconnection.close()
+    print(f"Student ID {student_id} updated to {new_name}.")
+
+
 def show_table():
     sqliteconnection = sqlite3.connect('students.db')
     cursor = sqliteconnection.cursor()
@@ -124,6 +153,7 @@ def main():
         print("2. Delete Student")
         print("3. Show Students and Marks")
         print("4. Add Marks")
+        print("5. Edit Student Details")
         print("0. Exit")
 
         choice = input("Enter your choice: ")
@@ -136,6 +166,8 @@ def main():
             show_table()
         elif choice == '4':
             add_mark()
+        elif choice == '5':
+            edit_student_details()
         elif choice == '0':
             print("Exiting...")
             break
